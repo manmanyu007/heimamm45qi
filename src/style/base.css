@@ -1,0 +1,13 @@
+html,body{
+    height: 100%;
+}
+/* 工作中，可以写一堆标签
+    * 比较耗性能
+
+*/
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* 内建模型盒子 */
+}
