@@ -17,20 +17,29 @@
         label-width="43px"
         class="demo-ruleForm login-form"
       >
-      <!-- 手机号 -->
+        <!-- 手机号 -->
         <el-form-item prop="phone">
-          <el-input class="high-input" prefix-icon="el-icon-user" placeholder="请输入手机号" v-model="ruleForm.phone"
+          <el-input
+            class="high-input"
+            prefix-icon="el-icon-user"
+            placeholder="请输入手机号"
+            v-model="ruleForm.phone"
           ></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item prop="password">
-          <el-input  show-password prefix-icon="el-icon-lock" placeholder="请输入密码" v-model="ruleForm.password"></el-input>
+          <el-input
+            show-password
+            prefix-icon="el-icon-lock"
+            placeholder="请输入密码"
+            v-model="ruleForm.password"
+          ></el-input>
         </el-form-item>
         <!--验证码  -->
         <el-form-item prop="code">
           <el-row>
             <el-col :span="18">
-              <el-input prefix-icon="el-icon-key"  placeholder="请输入验证码" v-model="ruleForm.code"></el-input>
+              <el-input prefix-icon="el-icon-key" placeholder="请输入验证码" v-model="ruleForm.code"></el-input>
             </el-col>
             <el-col :span="6" class="code-col">
               <img @click="changeCode" :src="codeUrl" alt />
@@ -56,6 +65,8 @@
   </div>
 </template>
 <script>
+//  导入axios
+import axios from "axios";
 // 验证手机号方法
 var validatePass = (rule, value, callback) => {
   if (value === "") {
@@ -79,7 +90,7 @@ export default {
         phone: "",
         password: "",
         code: "",
-      checked:false
+        checked: false
       },
       rules: {
         phone: [{ validator: validatePass, trigger: "blur" }],
@@ -101,15 +112,38 @@ export default {
   },
   methods: {
     submitForm(formName) {
-        if (this.ruleForm.checked==false) {
-            this.$message.warning("请勾选用户协议");
-            return;
-        }
+      if (this.ruleForm.checked == false) {
+        this.$message.warning("请勾选用户协议");
+        return;
+      }
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$message.success("验证成功");
+          // this.$message.success("验证成功");
+          // axios发送请求
+          axios({
+            url: process.env.VUE_APP_BASEURL + "/login",
+            method: "post",
+            // 是否携带cookies
+            withCredentials: true,
+            data: {
+              phone: this.ruleForm.phone,
+              password: this.ruleForm.password,
+              code: this.ruleForm.code
+            }
+          }).then(res => {
+            //成功回调
+            // 判断是否响应成功
+            // 失败
+            if (res.data.code == 202) {
+              this.$message.error(res.data.message);
+            } 
+            // 成功
+            else if (res.data.code == 200) {
+              this.$message.success("验证成功");
+            }
+          });
         } else {
-          this.$message.success("验证失败");
+          this.$message.error("验证失败");
           return false;
         }
       });
@@ -117,8 +151,9 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
-    changeCode(){
-     this.codeUrl=process.env.VUE_APP_BASEURL + "/captcha?type=login&"+Date.now()
+    changeCode() {
+      this.codeUrl =
+        process.env.VUE_APP_BASEURL + "/captcha?type=login&" + Date.now();
     }
   }
 };
