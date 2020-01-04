@@ -17,29 +17,20 @@
         label-width="43px"
         class="demo-ruleForm login-form"
       >
-        <!-- 手机号 -->
+      <!-- 手机号 -->
         <el-form-item prop="phone">
-          <el-input
-            class="high-input"
-            prefix-icon="el-icon-user"
-            placeholder="请输入手机号"
-            v-model="ruleForm.phone"
+          <el-input class="high-input" prefix-icon="el-icon-user" placeholder="请输入手机号" v-model="ruleForm.phone"
           ></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item prop="password">
-          <el-input
-            show-password
-            prefix-icon="el-icon-lock"
-            placeholder="请输入密码"
-            v-model="ruleForm.password"
-          ></el-input>
+          <el-input  show-password prefix-icon="el-icon-lock" placeholder="请输入密码" v-model="ruleForm.password"></el-input>
         </el-form-item>
         <!--验证码  -->
         <el-form-item prop="code">
           <el-row>
             <el-col :span="18">
-              <el-input prefix-icon="el-icon-key" placeholder="请输入验证码" v-model="ruleForm.code"></el-input>
+              <el-input prefix-icon="el-icon-key"  placeholder="请输入验证码" v-model="ruleForm.code"></el-input>
             </el-col>
             <el-col :span="6" class="code-col">
               <img @click="changeCode" :src="codeUrl" alt />
