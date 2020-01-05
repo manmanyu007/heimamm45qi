@@ -30,3 +30,16 @@ export function register(data) {
         data
       })
 }
+//定义一个注册的方法
+export function info() {
+   return axios({
+        url: process.env.VUE_APP_BASEURL + "/info",
+        method: "get",
+        // 是否携带cookies
+        withCredentials: true,
+        headers:{
+        //  从缓存中获取
+        token:window.localStorage.getItem("infotoken")
+       }
+      })
+}

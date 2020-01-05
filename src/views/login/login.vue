@@ -55,7 +55,7 @@
           </el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-button class="login-btn" type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+          <el-button class="login-btn" type="primary" @click="submitForm('ruleForm')">登录</el-button>
           <el-button class="login-btn reset-btn" type="primary" @click="dialogFormVisible = true">注册</el-button>
         </el-form-item>
       </el-form>
@@ -254,11 +254,14 @@ export default {
             }
             // 成功
             else if (res.data.code == 200) {
-              this.$message.success("验证成功");
+              this.$message.success("登录成功");
+              window.localStorage.setItem("infotoken",res.data.data.token);
+              // 跳转页面
+              this.$router.push("/index")
             }
           });
         } else {
-          this.$message.error("验证失败");
+          this.$message.error("用户名或者密码不匹配");
           return false;
         }
       });
@@ -324,9 +327,7 @@ export default {
       // 2. name需要设置为接口需要的值name='image'
       // 3. 上传成功之后的回调函数中
       //    1. res可以获取 服务器响应的数据
-
       this.form.avatar = res.data.file_path;
-      window.console.log(this.form.avatar);
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
