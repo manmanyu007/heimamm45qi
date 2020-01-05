@@ -85,21 +85,21 @@
           </el-upload>
         </el-form-item>
         <el-form-item label="昵称" :label-width="formLabelWidth" prop="username">
-          <el-input v-model="form.username" autocomplete="off" ></el-input>
+          <el-input v-model="form.username" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" :label-width="formLabelWidth"  prop="email">
+        <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
           <el-input v-model="form.email" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="手机" :label-width="formLabelWidth"  prop="phone">
+        <el-form-item label="手机" :label-width="formLabelWidth" prop="phone">
           <el-input v-model="form.phone" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
-          <el-input  show-password v-model="form.password" autocomplete="off" ></el-input>
+          <el-input show-password v-model="form.password" autocomplete="off"></el-input>
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="16">
             <el-form-item label="图形码" :label-width="formLabelWidth">
-              <el-input v-model="form.code" autocomplete="off" ></el-input>
+              <el-input v-model="form.code" autocomplete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8" class="code-col">
@@ -113,7 +113,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8" class="code-col">
-            <el-button  @click="getMessge" :disabled="delayTime!=0">{{btnMessage}}</el-button>
+            <el-button @click="getMessge" :disabled="delayTime!=0">{{btnMessage}}</el-button>
           </el-col>
         </el-row>
       </el-form>
@@ -128,7 +128,7 @@
 //  导入axios
 // import axios from "axios";
 // 导入login api
-import { login ,sendsms, register} from "../../api/login";
+import { login, sendsms, register } from "../../api/login";
 // 验证手机号方法
 var validatePass = (rule, value, callback) => {
   if (value === "") {
@@ -150,7 +150,7 @@ var checkEmail = (rule, value, callback) => {
     callback(new Error("邮箱为空"));
   } else {
     // 正则
-    const reg =/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+    const reg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
     // 判断
     if (reg.test(value) == true) {
       callback();
@@ -174,16 +174,16 @@ export default {
       },
       // 注册框
       dialogFormVisible: false,
-     
+
       formLabelWidth: "86px",
       form: {
         username: "",
         email: "",
         phone: "",
         password: "",
-        code:"",
+        code: "",
         rcode: "",
-        avatar:""  
+        avatar: ""
       },
 
       rules: {
@@ -197,29 +197,38 @@ export default {
             trigger: "change"
           }
         ],
-       
+
         code: [
           { required: true, message: "请输入验证码", trigger: "blur" },
           { min: 4, max: 4, message: "长度在必须在4位数", trigger: "blur" }
         ]
       },
       // 注册框验证规则
-      resRules:{
-         username:[{required: true, message: "请输入用户名", trigger: "blur" }],
-         email:[ {  validator: checkEmail, trigger: "blur" }],
+      resRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" }
+        ],
+        email: [{ validator: checkEmail, trigger: "blur" }],
         phone: [{ required: true, validator: validatePass, trigger: "blur" }],
-         password: [{ required: true, message: "请输入密码", trigger: "blur" },
-                 {min: 6,max: 18,message: "长度在 6 到 18 个字符",trigger: "change"}],
-         avatar:[{required: true, message: "头像不能为空", trigger: "blur" }]
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            min: 6,
+            max: 18,
+            message: "长度在 6 到 18 个字符",
+            trigger: "change"
+          }
+        ],
+        avatar: [{ required: true, message: "头像不能为空", trigger: "blur" }]
       },
       // 定义倒计时时间
-        delayTime:0,
-        // 定义用户验证码
-        btnMessage:"获取用户验证码",
+      delayTime: 0,
+      // 定义用户验证码
+      btnMessage: "获取用户验证码",
 
-         imageUrl: "",
-        // 定义文件图片地址
-        uploadURL: process.env.VUE_APP_BASEURL + "/uploads"
+      imageUrl: "",
+      // 定义文件图片地址
+      uploadURL: process.env.VUE_APP_BASEURL + "/uploads"
     };
   },
   methods: {
@@ -265,59 +274,59 @@ export default {
         process.env.VUE_APP_BASEURL + "/captcha?type=sendsms&" + Date.now();
     },
     // 短信验证码点击事件
-    getMessge(){
-        // 手机号验证
-         const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
-         if (reg.test(this.form.phone)==false) {
-              return this.$message.error("输入的手机号不正确")
-         }
-           // 图形码验证
-         if(this.form.code.length!==4){
-             return this.$message.error("验证码输入不对哦")
-         }
-        //  通过开始倒计时
-         if (this.delayTime==0) {
-              //  修改delayTime的值
-              this.delayTime=60;
-               // 创建定时器
-              const interId=setInterval(() => {
-                      // 时间递减
-                   this.delayTime--
-                       // 修改用户验证码的值为倒计时时间
-                       this.btnMessage=`还剩${this.delayTime}秒哦`
-                              // 时间递减完 清除定时器
-               if (this.delayTime==0) {
-                   clearInterval(interId)
-                  //  还原用户验证码的值
-                this.btnMessage="获取用户验证码"
-               }
-              }, 1000);
-         } else{
-           return;
-         }
-      
-       sendsms({
-         code:this.form.code,
-         phone:this.form.phone,
-       }).then(res=>{
-           window.console.log(res);
-           if (res.data.code==200) {
-              this.$message.success("您的短信验证码为"+res.data.data.captcha)
-           }
-       })
+    getMessge() {
+      // 手机号验证
+      const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+      if (reg.test(this.form.phone) == false) {
+        return this.$message.error("输入的手机号不正确");
+      }
+      // 图形码验证
+      if (this.form.code.length !== 4) {
+        return this.$message.error("验证码输入不对哦");
+      }
+      //  通过开始倒计时
+      if (this.delayTime == 0) {
+        //  修改delayTime的值
+        this.delayTime = 60;
+        // 创建定时器
+        const interId = setInterval(() => {
+          // 时间递减
+          this.delayTime--;
+          // 修改用户验证码的值为倒计时时间
+          this.btnMessage = `还剩${this.delayTime}秒哦`;
+          // 时间递减完 清除定时器
+          if (this.delayTime == 0) {
+            clearInterval(interId);
+            //  还原用户验证码的值
+            this.btnMessage = "获取用户验证码";
+          }
+        }, 1000);
+      } else {
+        return;
+      }
+
+      sendsms({
+        code: this.form.code,
+        phone: this.form.phone
+      }).then(res => {
+        window.console.log(res);
+        if (res.data.code == 200) {
+          this.$message.success("您的短信验证码为" + res.data.data.captcha);
+        }
+      });
     },
 
     // 文件上传
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
-// 注意:
-// 1. action需要动态设置
-// 2. name需要设置为接口需要的值name='image'
-// 3. 上传成功之后的回调函数中
-//    1. res可以获取 服务器响应的数据
+      // 注意:
+      // 1. action需要动态设置
+      // 2. name需要设置为接口需要的值name='image'
+      // 3. 上传成功之后的回调函数中
+      //    1. res可以获取 服务器响应的数据
 
-       this.form.avatar =res.data.file_path;
-      window.console.log(  this.form.avatar);
+      this.form.avatar = res.data.file_path;
+      window.console.log(this.form.avatar);
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
@@ -332,32 +341,32 @@ export default {
       return isJPG && isLt2M;
     },
     // 注册提交
-    submitRegister(){
+    submitRegister() {
       // 表单验证
-        this.$refs.form.validate(valid=>{
-            if (valid) {
-              // 调用接口
-                 register({
-                    username:this.form.username,
-                    phone:this.form.phone,
-                    email:this.form. email,
-                    avatar:this.form. avatar,
-                    password:this.form.password,
-                    rcode:this.form.rcode
-                 }).then(res=>{
-                   window.console.log(res);
-                   if (res.data.code==200) {
-                       this.$message.success("注册成功")
-                      //  关闭对话框
-                      this.dialogFormVisible=false;
-                   }else if (res.data.code==201) {
-                       this.$message.warning(res.data.message)
-                   }
-                 })
-            }else{
-              this.$message.error("请输入完整")
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          // 调用接口
+          register({
+            username: this.form.username,
+            phone: this.form.phone,
+            email: this.form.email,
+            avatar: this.form.avatar,
+            password: this.form.password,
+            rcode: this.form.rcode
+          }).then(res => {
+            window.console.log(res);
+            if (res.data.code == 200) {
+              this.$message.success("注册成功");
+              //  关闭对话框
+              this.dialogFormVisible = false;
+            } else if (res.data.code == 201) {
+              this.$message.warning(res.data.message);
             }
-        })
+          });
+        } else {
+          this.$message.error("请输入完整");
+        }
+      });
     }
   }
 };
@@ -480,11 +489,10 @@ export default {
       height: 100%;
       cursor: pointer;
     }
-    .el-button{
-        width: 100%;
+    .el-button {
+      width: 100%;
       height: 100%;
       cursor: pointer;
-
     }
   }
 }
