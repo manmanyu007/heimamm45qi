@@ -9,7 +9,7 @@
         <div class="line"></div>
         <div class="sub-title">用户登录</div>
       </div>
-      <!-- 左侧盒子中的表单 -->
+      <!-- 登录盒子中的表单 -->
       <el-form
         :model="ruleForm"
         :rules="rules"
@@ -63,18 +63,15 @@
     <!-- 右边的图片 -->
     <img class="bg" src="../../assets/img/login_banner_ele.png" alt />
     <!-- 注册对话框 -->
-    <el-dialog title :visible.sync="dialogFormVisible" class="register-dialog">
-      <div class="logon_title">注册</div>
-      <!-- 表单 -->
-      <el-form
-        :model="ruleForm"
-        :rules="rules"
-        ref="ruleForm"
-        label-width="86px"
-        class="demo-ruleForm logon_form"
-      >
-        <el-form-item label="头像" prop="pic_file" class="pic_file">
-          <!-- 用户头像 -->
+    <el-dialog
+      center
+      width="600px"
+      title="注册"
+      :visible.sync="dialogFormVisible"
+      class="register-dialog"
+    >
+      <el-form :model="form">
+        <el-form-item label="头像" :label-width="formLabelWidth">
           <el-upload
             class="avatar-uploader"
             action="https://jsonplaceholder.typicode.com/posts/"
@@ -86,41 +83,40 @@
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
-        <el-form-item label="昵称" prop="name">
-          <el-input v-model="ruleForm.name"></el-input>
+        <el-form-item label="昵称" :label-width="formLabelWidth">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="ruleForm.email"></el-input>
+        <el-form-item label="邮箱" :label-width="formLabelWidth">
+          <el-input v-model="form.email" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="手机" prop="phone">
-          <el-input v-model="ruleForm.phone"></el-input>
+        <el-form-item label="手机" :label-width="formLabelWidth">
+          <el-input v-model="form.phone" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="ruleForm.password" show-password></el-input>
+        <el-form-item label="密码" :label-width="formLabelWidth">
+          <el-input  show-password v-model="form.password" autocomplete="off"></el-input>
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="16">
-            <el-form-item label="图形码" prop="Graphics_code">
-              <el-input v-model="ruleForm.Graphics_code"></el-input>
+            <el-form-item label="图形码" :label-width="formLabelWidth">
+              <el-input v-model="form.code" autocomplete="off"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <img src="../../assets/img/code.jpg" alt />
+          <el-col :span="8" class="code-col">
+            <img :src="regCodeUrl" @click="changeRegCodeUrl" alt />
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="16">
-            <el-form-item label="验证码" prop="Verification_code">
-              <el-input v-model="ruleForm.Verification_codee"></el-input>
+            <el-form-item label="验证码" :label-width="formLabelWidth">
+              <el-input v-model="form.rcode" autocomplete="off"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <button class="logon_btn">获取用户验证码</button>
+          <el-col :span="8" class="code-col">
+            <el-button type="button">获取用户验证码</el-button>
           </el-col>
         </el-row>
       </el-form>
-      <!-- 底部按钮 -->
-      <div slot="footer" class="dialog-footer my_footer">
+      <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
       </div>
@@ -131,21 +127,8 @@
 //  导入axios
 // import axios from "axios";
 // 导入login api
-import {login} from "../../api/login"
-// 邮箱验证
-var emailCheck = (rule, value, callback) => {
-  if (value === "") {
-    callback(new Error("请输入邮箱"));
-  } else {
-    // 定义正则
-    const reg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-    if (reg.test(value) == true) {
-      callback();
-    } else {
-      callback(new Error("输入的邮箱格式不对哦!!1"));
-    }
-  }
-};
+import { login } from "../../api/login";
+
 // 验证手机号方法
 var validatePass = (rule, value, callback) => {
   if (value === "") {
@@ -164,20 +147,29 @@ var validatePass = (rule, value, callback) => {
 export default {
   data() {
     return {
+      // 注册验证码
+      regCodeUrl: process.env.VUE_APP_BASEURL + "/captcha?type=sendsms",
+      // 登录验证码
       codeUrl: process.env.VUE_APP_BASEURL + "/captcha?type=login",
-      dialogFormVisible: false,
-      imageUrl: "",
       ruleForm: {
         phone: "",
         password: "",
         code: "",
-        checked: false,
-        // 对话框
+        checked: false
+      },
+      // 注册框
+      dialogFormVisible: false,
+      imageUrl: "",
+      formLabelWidth: "86px",
+      form: {
         name: "",
         email: "",
+        phone: "",
+        password: "",
         Graphics_code: "",
         Verification_code: ""
       },
+
       rules: {
         phone: [{ required: true, validator: validatePass, trigger: "blur" }],
         password: [
@@ -192,17 +184,7 @@ export default {
         code: [
           { required: true, message: "请输入验证码", trigger: "blur" },
           { min: 4, max: 4, message: "长度在必须在4位数", trigger: "blur" }
-        ],
-        pic_file: [{ required: true }],
-        name: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "change" }
-        ],
-        email: [{ required: true, validator: emailCheck, trigger: "blur" }],
-        Graphics_code: [
-          { min: 4, max: 4, message: "长度在必须为四位数", trigger: "change" }
-        ],
-        Verification_code: [{ message: "请输入验证码", trigger: "blur" }]
+        ]
       }
     };
   },
@@ -216,11 +198,11 @@ export default {
         if (valid) {
           // this.$message.success("验证成功");
           // axios发送请求
-         login({
-             phone: this.ruleForm.phone,
-          password: this.ruleForm.password,
-          code: this.ruleForm.code
-         }).then(res => {
+          login({
+            phone: this.ruleForm.phone,
+            password: this.ruleForm.password,
+            code: this.ruleForm.code
+          }).then(res => {
             //成功回调
             // 判断是否响应成功
             // 失败
@@ -238,9 +220,15 @@ export default {
         }
       });
     },
+    // 登录验证码点击事件
     changeCode() {
       this.codeUrl =
         process.env.VUE_APP_BASEURL + "/captcha?type=login&" + Date.now();
+    },
+    // 注册验证码点击事件
+    changeRegCodeUrl() {
+      this.regCodeUrl =
+        process.env.VUE_APP_BASEURL + "/captcha?type=sendsms&" + Date.now();
     },
     // 文件上传
     handleAvatarSuccess(res, file) {
@@ -308,14 +296,7 @@ export default {
     .login-form {
       padding-right: 41px;
       margin-top: 27px;
-      // 验证码
-      .code-col {
-        height: 40px;
-        img {
-          width: 100%;
-          height: 100%;
-        }
-      }
+
       // 文本框高度
       .high-input > input {
         height: 45px;
@@ -332,71 +313,66 @@ export default {
     }
   }
   // 注册框格式
-  .register-dialog{
-  .el-dialog {
-      width: 600px;
-    };
-    .el-dialog__body {
-    padding: 0;
-  };
-   .el-dialog__body .logon_form {
-    padding-right: 27px;
-  }
-  .el-dialog__body .logon_title {
-    height: 53px;
-    background-color: #409eff;
-    text-align: center;
-    line-height: 53px;
-    margin-bottom: 27px;
-    color: #ffffff;
-  }
-  .el-dialog__header {
-    display: none;
-  }
-  .my_footer {
-    text-align: center;
-  }
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
+  .register-dialog {
+    .el-dialog__header {
+      background: linear-gradient(
+        225deg,
+        rgba(1, 198, 250, 1),
+        rgba(20, 147, 250, 1)
+      );
+      margin-bottom: 27px;
+    }
 
-  .el-upload {
-    border: 1px dashed #d9d9d9;
-  }
-  .pic_file {
-    text-align: center;
-  }
-  .avatar-uploader .el-upload:hover {
-    border-color: #409eff;
-  }
+    .avatar-uploader .el-upload {
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
 
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
+    .el-upload {
+      border: 1px dashed #d9d9d9;
+    }
+    .pic_file {
+      text-align: center;
+    }
+    .avatar-uploader .el-upload:hover {
+      border-color: #409eff;
+    }
 
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
-  }
-  .logon_btn {
-    width: 139px;
-    height: 39px;
-    background-color: #ffffff;
-    border: 1px solid rgba(211, 215, 223, 1);
-    border-radius: 4px;
-  }
-  }
+    .avatar-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 178px;
+      height: 178px;
+      line-height: 178px;
+      text-align: center;
+    }
 
- 
+    .avatar {
+      width: 178px;
+      height: 178px;
+      display: block;
+    }
+    .el-form-item__content {
+      text-align: center;
+    }
+  }
+  // 验证码
+  .code-col {
+    height: 40px;
+    img {
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .el-button{
+        width: 100%;
+      height: 100%;
+      cursor: pointer;
+
+    }
+  }
 }
 </style>
