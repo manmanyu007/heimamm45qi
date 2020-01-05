@@ -129,7 +129,9 @@
 </template>
 <script>
 //  导入axios
-import axios from "axios";
+// import axios from "axios";
+// 导入login api
+import {login} from "../../api/login"
 // 邮箱验证
 var emailCheck = (rule, value, callback) => {
   if (value === "") {
@@ -214,17 +216,11 @@ export default {
         if (valid) {
           // this.$message.success("验证成功");
           // axios发送请求
-          axios({
-            url: process.env.VUE_APP_BASEURL + "/login",
-            method: "post",
-            // 是否携带cookies
-            withCredentials: true,
-            data: {
-              phone: this.ruleForm.phone,
-              password: this.ruleForm.password,
-              code: this.ruleForm.code
-            }
-          }).then(res => {
+         login({
+             phone: this.ruleForm.phone,
+          password: this.ruleForm.password,
+          code: this.ruleForm.code
+         }).then(res => {
             //成功回调
             // 判断是否响应成功
             // 失败
