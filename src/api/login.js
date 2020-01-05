@@ -20,3 +20,13 @@ export function sendsms(data) {
         data
       })
 }
+//定义一个注册的方法
+export function register(data) {
+   return axios({
+        url: process.env.VUE_APP_BASEURL + "/register",
+        method: "post",
+        // 是否携带cookies
+        withCredentials: true,
+        data
+      })
+}

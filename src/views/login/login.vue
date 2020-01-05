@@ -70,11 +70,12 @@
       :visible.sync="dialogFormVisible"
       class="register-dialog"
     >
-      <el-form :model="form" :rules="resRules">
+      <el-form :model="form" ref="form" :rules="resRules">
         <el-form-item label="头像" :label-width="formLabelWidth" prop="avatar">
           <el-upload
+            name="image"
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            :action="uploadURL"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -118,7 +119,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="submitRegister">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -127,8 +128,7 @@
 //  导入axios
 // import axios from "axios";
 // 导入login api
-import { login ,sendsms} from "../../api/login";
-
+import { login ,sendsms, register} from "../../api/login";
 // 验证手机号方法
 var validatePass = (rule, value, callback) => {
   if (value === "") {
@@ -174,8 +174,7 @@ export default {
       },
       // 注册框
       dialogFormVisible: false,
-      // 文件图片地址
-      imageUrl: "",
+     
       formLabelWidth: "86px",
       form: {
         username: "",
@@ -208,22 +207,19 @@ export default {
       resRules:{
          username:[{required: true, message: "请输入用户名", trigger: "blur" }],
          email:[ {  validator: checkEmail, trigger: "blur" }],
-           phone: [{ required: true, validator: validatePass, trigger: "blur" }],
-             password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          {
-            min: 6,
-            max: 18,
-            message: "长度在 6 到 18 个字符",
-            trigger: "change"
-          }
-        ],
+        phone: [{ required: true, validator: validatePass, trigger: "blur" }],
+         password: [{ required: true, message: "请输入密码", trigger: "blur" },
+                 {min: 6,max: 18,message: "长度在 6 到 18 个字符",trigger: "change"}],
          avatar:[{required: true, message: "头像不能为空", trigger: "blur" }]
       },
       // 定义倒计时时间
         delayTime:0,
         // 定义用户验证码
-        btnMessage:"获取用户验证码"
+        btnMessage:"获取用户验证码",
+
+         imageUrl: "",
+        // 定义文件图片地址
+        uploadURL: process.env.VUE_APP_BASEURL + "/uploads"
     };
   },
   methods: {
@@ -314,6 +310,14 @@ export default {
     // 文件上传
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
+// 注意:
+// 1. action需要动态设置
+// 2. name需要设置为接口需要的值name='image'
+// 3. 上传成功之后的回调函数中
+//    1. res可以获取 服务器响应的数据
+
+       this.form.avatar =res.data.file_path;
+      window.console.log(  this.form.avatar);
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
@@ -326,6 +330,34 @@ export default {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
       return isJPG && isLt2M;
+    },
+    // 注册提交
+    submitRegister(){
+      // 表单验证
+        this.$refs.form.validate(valid=>{
+            if (valid) {
+              // 调用接口
+                 register({
+                    username:this.form.username,
+                    phone:this.form.phone,
+                    email:this.form. email,
+                    avatar:this.form. avatar,
+                    password:this.form.password,
+                    rcode:this.form.rcode
+                 }).then(res=>{
+                   window.console.log(res);
+                   if (res.data.code==200) {
+                       this.$message.success("注册成功")
+                      //  关闭对话框
+                      this.dialogFormVisible=false;
+                   }else if (res.data.code==201) {
+                       this.$message.warning(res.data.message)
+                   }
+                 })
+            }else{
+              this.$message.error("请输入完整")
+            }
+        })
     }
   }
 };
